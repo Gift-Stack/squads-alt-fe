@@ -12,27 +12,6 @@ const Vaults = () => {
     walletAddress: primaryWallet?.address,
   });
 
-  console.log("multisigAccount", multisigAccounts);
-  // Mock data for demonstration
-  const vaults = [
-    {
-      id: "vault-1",
-      name: "Founders Squad",
-      balance: "4,324,078.00",
-      pendingTransactions: 2,
-      members: 3,
-      signaturesRequired: 2,
-    },
-    {
-      id: "vault-2",
-      name: "Development Fund",
-      balance: "127,500.00",
-      pendingTransactions: 0,
-      members: 3,
-      signaturesRequired: 2,
-    },
-  ];
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {multisigAccounts?.map((vault) => (
@@ -56,7 +35,9 @@ const Vaults = () => {
               <div>
                 <p className="text-sm text-zinc-500 mb-1">Balance:</p>
                 <p className="text-2xl font-bold text-white">
-                  ${vault.balance}
+                  {/* TODO: get balance */}
+                  {/* @ts-expect-error I will be fixing this soon */}$
+                  {vault.balance}
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-4">

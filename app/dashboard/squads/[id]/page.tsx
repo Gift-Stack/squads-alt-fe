@@ -272,8 +272,8 @@ export default function VaultDetails({
             <TabsTrigger value="transactions" className="gap-2">
               <History className="h-4 w-4" /> Transactions
             </TabsTrigger>
-            <TabsTrigger value="owners" className="gap-2">
-              <Users className="h-4 w-4" /> Owners
+            <TabsTrigger value="members" className="gap-2">
+              <Users className="h-4 w-4" /> Members
             </TabsTrigger>
           </TabsList>
 
@@ -368,7 +368,7 @@ export default function VaultDetails({
             </Card>
           </TabsContent>
 
-          <TabsContent value="owners" className="space-y-6">
+          <TabsContent value="members" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>Members</CardTitle>
@@ -386,9 +386,11 @@ export default function VaultDetails({
                       <div className="flex items-center gap-4">
                         <Avatar>
                           <AvatarFallback>
+                            {/* TODO: get avatar */}
+                            {/* @ts-expect-error I will be fixing this soon */}
                             {owner.name
                               ?.split(" ")
-                              ?.map((n) => n[0])
+                              ?.map((n: string) => n[0])
                               .join("")}
                           </AvatarFallback>
                         </Avatar>
