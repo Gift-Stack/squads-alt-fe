@@ -7,6 +7,7 @@ import { useUserWallets } from "@dynamic-labs/sdk-react-core";
 import { SolanaWallet } from "@dynamic-labs/solana-core";
 import {
   AddressLookupTableAccount,
+  ComputeBudgetProgram,
   PublicKey,
   TransactionInstruction,
   TransactionMessage,
@@ -260,7 +261,11 @@ export const useExecuteProposal = () => {
 
       if (type === "ConfigTransaction") {
         instructionAndLookupTableAccounts = {
-          instruction: multisig.instructions.configTransactionExecute(payload),
+          instruction: multisig.instructions.configTransactionExecute({
+            ...payload,
+            rentPayer: new PublicKey(wallet.address),
+            programId: multisig.PROGRAM_ID,
+          }),
           lookupTableAccounts: null,
         };
       } else {
@@ -279,9 +284,20 @@ export const useExecuteProposal = () => {
 
       const signer = await wallet.getSigner();
 
+      const priorityFeeInstruction = ComputeBudgetProgram.setComputeUnitPrice({
+        microLamports: 5000,
+      });
+      const computeUnitInstruction = ComputeBudgetProgram.setComputeUnitLimit({
+        units: 200_000,
+      });
+
       const messageV0 = new TransactionMessage({
         payerKey: new PublicKey(wallet.address),
-        instructions: [instructionAndLookupTableAccounts.instruction],
+        instructions: [
+          priorityFeeInstruction,
+          computeUnitInstruction,
+          instructionAndLookupTableAccounts.instruction,
+        ],
         recentBlockhash: latestBlockhash.blockhash,
       }).compileToV0Message(
         instructionAndLookupTableAccounts.lookupTableAccounts ?? undefined

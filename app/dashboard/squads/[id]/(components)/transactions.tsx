@@ -18,8 +18,6 @@ const Transactions = ({ vaultAddress }: { vaultAddress: string }) => {
 
   if (!transactions) return null;
 
-  console.log("transactionsSSS", transactions);
-
   return (
     <div className="space-y-4">
       {transactions.map((tx) => (
