@@ -1,6 +1,5 @@
 import { solanaClient } from "@/lib/web3-utils";
 import * as multisig from "@sqds/multisig";
-import { address } from "gill";
 import { PublicKey } from "@solana/web3.js";
 import { Multisig as MultisigType } from "./type";
 

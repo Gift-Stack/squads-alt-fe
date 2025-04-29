@@ -33,6 +33,8 @@ import { copyToClipboard } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import { useBalances } from "@/store/account";
 import SquadAssets from "./(components)/assets";
+import AddMemberModal from "@/modals/add-member";
+import Transactions from "./(components)/transactions";
 
 export default function VaultDetails({
   params,
@@ -43,6 +45,7 @@ export default function VaultDetails({
   const { primaryWallet } = useDynamicContext();
   const paramsData = use(params);
   const { toast } = useToast();
+  const [showAddMember, setShowAddMember] = useState(false);
 
   const {
     data: squad,
@@ -136,7 +139,11 @@ export default function VaultDetails({
     ],
   };
 
-  if (isLoading || !paramsData.id || !primaryWallet?.address) {
+  if (!primaryWallet?.address) {
+    return <div>Please connect your wallet</div>;
+  }
+
+  if (isLoading || !paramsData.id) {
     // Add a loading state
     return <div>Loading...</div>;
   }
@@ -236,7 +243,7 @@ export default function VaultDetails({
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">
-                {squad.account.staleTransactionIndex}
+                {squad.account.transactionIndex}
               </div>
               <p className="text-sm text-muted-foreground">
                 Requiring signatures
@@ -290,70 +297,7 @@ export default function VaultDetails({
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {vault.transactions.map((tx) => (
-                    <div
-                      key={tx.id}
-                      className="flex items-center justify-between p-4 border rounded-lg"
-                    >
-                      <div className="flex items-start gap-4">
-                        <div
-                          className={`p-2 rounded-full ${
-                            tx.status === "pending"
-                              ? "bg-amber-100"
-                              : "bg-green-100"
-                          }`}
-                        >
-                          {tx.status === "pending" ? (
-                            <Clock
-                              className={`h-5 w-5 ${
-                                tx.status === "pending"
-                                  ? "text-amber-600"
-                                  : "text-green-600"
-                              }`}
-                            />
-                          ) : (
-                            <CheckCircle2 className="h-5 w-5 text-green-600" />
-                          )}
-                        </div>
-                        <div>
-                          <div className="font-medium flex items-center gap-2">
-                            {tx.type}
-                            <Badge
-                              variant={
-                                tx.status === "pending"
-                                  ? "outline"
-                                  : "secondary"
-                              }
-                            >
-                              {tx.status === "pending"
-                                ? "Pending"
-                                : "Completed"}
-                            </Badge>
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            {tx.amount} to {tx.recipient}
-                          </div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            {tx.created}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex flex-col items-end gap-2">
-                        <div className="text-sm font-medium">
-                          Signatures: {tx.signatures}
-                        </div>
-                        {tx.status === "pending" && (
-                          <Link href={`/dashboard/transactions/${tx.id}`}>
-                            <Button variant="outline" size="sm">
-                              Review
-                            </Button>
-                          </Link>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <Transactions vaultAddress={squad.address} />
               </CardContent>
               <CardFooter>
                 <Link
@@ -418,8 +362,12 @@ export default function VaultDetails({
                 </div>
               </CardContent>
               <CardFooter className="flex justify-between">
-                <Button variant="outline" className="gap-2">
-                  <Users className="h-4 w-4" /> Add Owner
+                <Button
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() => setShowAddMember(true)}
+                >
+                  <Users className="h-4 w-4" /> Add Member
                 </Button>
                 <Button variant="outline" className="gap-2">
                   <Settings className="h-4 w-4" /> Manage Roles
@@ -429,6 +377,12 @@ export default function VaultDetails({
           </TabsContent>
         </Tabs>
       </main>
+      <AddMemberModal
+        userWalletAddress={primaryWallet.address}
+        squad={squad}
+        open={showAddMember}
+        onClose={() => setShowAddMember(false)}
+      />
     </div>
   );
 }
