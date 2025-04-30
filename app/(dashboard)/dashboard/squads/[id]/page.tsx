@@ -17,8 +17,6 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   ChevronLeft,
   ArrowUpRight,
-  Clock,
-  CheckCircle2,
   Users,
   Settings,
   Copy,
@@ -30,11 +28,11 @@ import DashboardHeader from "@/app/components/dashboard-header";
 import { useSquad } from "@/store/multi-sig";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { copyToClipboard } from "@/lib/utils";
-import { useToast } from "@/components/ui/use-toast";
 import { useBalances } from "@/store/account";
 import SquadAssets from "./(components)/assets";
 import AddMemberModal from "@/modals/add-member";
 import Transactions from "./(components)/transactions";
+import { toast } from "sonner";
 
 export default function VaultDetails({
   params,
@@ -44,7 +42,6 @@ export default function VaultDetails({
   const [activeTab, setActiveTab] = useState("overview");
   const { primaryWallet } = useDynamicContext();
   const paramsData = use(params);
-  const { toast } = useToast();
   const [showAddMember, setShowAddMember] = useState(false);
 
   const {
@@ -104,8 +101,7 @@ export default function VaultDetails({
                   className="h-8 w-8"
                   onClick={async () => {
                     const success = await copyToClipboard(squad.defaultVault);
-                    toast({
-                      title: success ? "Copied!" : "Copy failed",
+                    toast(success ? "Copied!" : "Copy failed", {
                       description: success
                         ? "Vault address copied to clipboard."
                         : "Could not copy address.",

@@ -79,7 +79,7 @@ export const useAddMember = () => {
           ],
         });
 
-      const proposalIx = await createProposalIx({
+      const proposalIx = createProposalIx({
         multisigPda: multisigAddress,
         transactionIndex: currentTransactionIndex,
         creator: walletAddress,

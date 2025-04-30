@@ -1,46 +1,85 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Slider } from "@/components/ui/slider"
-import { Switch } from "@/components/ui/switch"
-import { ChevronLeft, Plus, Trash2, Info, AlertCircle } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import DashboardHeader from "@/app/components/dashboard-header"
+import { useState } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { ChevronLeft, Plus, Trash2, Info, AlertCircle } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import DashboardHeader from "@/app/components/dashboard-header";
+import { useUserWallets } from "@dynamic-labs/sdk-react-core";
+import { SolanaWallet } from "@dynamic-labs/solana-core";
+import { useCreateSquad } from "@/store/multi-sig";
 
 export default function CreateVault() {
-  const [owners, setOwners] = useState([
-    { address: "", name: "" },
-    { address: "", name: "" },
-  ])
-  const [requiredSignatures, setRequiredSignatures] = useState(2)
+  const { mutateAsync: createSquad, isPending: isCreatingSquad } =
+    useCreateSquad();
+  const userWallets = useUserWallets() as SolanaWallet[];
+  const wallet = userWallets[0];
+  const [owners, setOwners] = useState<{ address: string }[]>([]);
+  const [requiredSignatures, setRequiredSignatures] = useState(1);
 
   const addOwner = () => {
-    setOwners([...owners, { address: "", name: "" }])
-  }
+    setOwners([...owners, { address: "" }]);
+  };
 
   const removeOwner = (index: number) => {
-    if (owners.length <= 2) return
-    const newOwners = [...owners]
-    newOwners.splice(index, 1)
-    setOwners(newOwners)
+    const newOwners = [...owners];
+    newOwners.splice(index, 1);
+    setOwners(newOwners);
     if (requiredSignatures > newOwners.length) {
-      setRequiredSignatures(newOwners.length)
+      setRequiredSignatures(newOwners.length);
     }
-  }
+  };
 
-  const updateOwner = (index: number, field: "address" | "name", value: string) => {
-    const newOwners = [...owners]
-    newOwners[index][field] = value
-    setOwners(newOwners)
-  }
+  const updateOwner = (index: number, value: string) => {
+    const newOwners = [...owners];
+    newOwners[index]["address"] = value;
+    setOwners(newOwners);
+  };
+
+  const handleCreateVault = async () => {
+    const res = await createSquad({
+      threshold: requiredSignatures,
+      members: owners
+        .filter((owner) => owner.address !== "")
+        .map((owner) => ({
+          address: owner.address,
+          permissions: {
+            proposer: true,
+            voter: true,
+            executor: true,
+          },
+        })),
+    });
+
+    console.log("{{res}}", res);
+  };
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -53,8 +92,12 @@ export default function CreateVault() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Create New Vault</h1>
-            <p className="text-muted-foreground">Set up a new multi-signature wallet for your team</p>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Create New Vault
+            </h1>
+            <p className="text-muted-foreground">
+              Set up a new multi-signature wallet for your team
+            </p>
           </div>
         </div>
 
@@ -69,37 +112,29 @@ export default function CreateVault() {
             <Card>
               <CardHeader>
                 <CardTitle>Basic Information</CardTitle>
-                <CardDescription>Enter the basic details for your multi-signature vault</CardDescription>
+                <CardDescription>
+                  Enter the basic details for your multi-signature vault
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="vault-name">Vault Name</Label>
                   <Input id="vault-name" placeholder="Team Treasury" />
-                  <p className="text-sm text-muted-foreground">A name to easily identify this vault</p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="vault-description">Description (Optional)</Label>
-                  <Input id="vault-description" placeholder="Main treasury for our team's funds" />
-                  <p className="text-sm text-muted-foreground">A brief description of this vault's purpose</p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="network">Network</Label>
-                  <Select defaultValue="ethereum">
-                    <SelectTrigger id="network">
-                      <SelectValue placeholder="Select network" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ethereum">Ethereum Mainnet</SelectItem>
-                      <SelectItem value="polygon">Polygon</SelectItem>
-                      <SelectItem value="arbitrum">Arbitrum</SelectItem>
-                      <SelectItem value="optimism">Optimism</SelectItem>
-                      <SelectItem value="goerli">Goerli Testnet</SelectItem>
-                    </SelectContent>
-                  </Select>
                   <p className="text-sm text-muted-foreground">
-                    The blockchain network where this vault will be deployed
+                    A name to easily identify this vault
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="vault-description">
+                    Description (Optional)
+                  </Label>
+                  <Input
+                    id="vault-description"
+                    placeholder="Main treasury for our team's funds"
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    A brief description of this vault's purpose
                   </p>
                 </div>
               </CardContent>
@@ -116,44 +151,54 @@ export default function CreateVault() {
             <Card>
               <CardHeader>
                 <CardTitle>Owners & Signatures</CardTitle>
-                <CardDescription>Add wallet addresses that can sign transactions from this vault</CardDescription>
+                <CardDescription>
+                  Add wallet addresses that can sign transactions from this
+                  vault
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <Alert>
                   <AlertCircle className="h-4 w-4" />
                   <AlertTitle>Important</AlertTitle>
                   <AlertDescription>
-                    Each owner will need to sign transactions according to the signature requirements you set.
+                    Each owner will need to sign transactions according to the
+                    signature requirements you set.
                   </AlertDescription>
                 </Alert>
 
                 <div className="space-y-4">
+                  <div className="flex flex-col md:flex-row gap-4 p-4 border rounded-lg">
+                    <div className="flex-1 space-y-2">
+                      <Label htmlFor={`owner-address-1`}>Member 1</Label>
+                      <Input
+                        id={`owner-address-1`}
+                        value={wallet?.address}
+                        disabled
+                      />
+                    </div>
+                  </div>
                   {owners.map((owner, index) => (
-                    <div key={index} className="flex flex-col md:flex-row gap-4 p-4 border rounded-lg">
+                    <div
+                      key={index}
+                      className="flex flex-col md:flex-row gap-4 p-4 border rounded-lg"
+                    >
                       <div className="flex-1 space-y-2">
-                        <Label htmlFor={`owner-name-${index}`}>Owner Name</Label>
-                        <Input
-                          id={`owner-name-${index}`}
-                          placeholder="John Doe"
-                          value={owner.name}
-                          onChange={(e) => updateOwner(index, "name", e.target.value)}
-                        />
-                      </div>
-                      <div className="flex-1 space-y-2">
-                        <Label htmlFor={`owner-address-${index}`}>Wallet Address</Label>
+                        <Label htmlFor={`owner-address-${index}`}>
+                          Member {index + 2}
+                        </Label>
                         <Input
                           id={`owner-address-${index}`}
                           placeholder="0x..."
                           value={owner.address}
-                          onChange={(e) => updateOwner(index, "address", e.target.value)}
+                          onChange={(e) => updateOwner(index, e.target.value)}
                         />
                       </div>
+
                       <div className="flex items-end">
                         <Button
                           variant="ghost"
                           size="icon"
                           onClick={() => removeOwner(index)}
-                          disabled={owners.length <= 2}
                         >
                           <Trash2 className="h-5 w-5 text-muted-foreground" />
                         </Button>
@@ -161,7 +206,11 @@ export default function CreateVault() {
                     </div>
                   ))}
 
-                  <Button variant="outline" className="w-full gap-2" onClick={addOwner}>
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2"
+                    onClick={addOwner}
+                  >
                     <Plus className="h-4 w-4" /> Add Owner
                   </Button>
                 </div>
@@ -171,8 +220,12 @@ export default function CreateVault() {
                     <div>
                       <Label>Required Signatures</Label>
                       <div className="flex items-center gap-2">
-                        <p className="text-2xl font-bold">{requiredSignatures}</p>
-                        <p className="text-sm text-muted-foreground">of {owners.length} owners</p>
+                        <p className="text-2xl font-bold">
+                          {requiredSignatures}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          of {owners.length + 1} owners
+                        </p>
                       </div>
                     </div>
                     <TooltipProvider>
@@ -184,8 +237,8 @@ export default function CreateVault() {
                         </TooltipTrigger>
                         <TooltipContent>
                           <p className="max-w-xs">
-                            This is the number of signatures required to approve and execute a transaction from this
-                            vault.
+                            This is the number of signatures required to approve
+                            and execute a transaction from this vault.
                           </p>
                         </TooltipContent>
                       </Tooltip>
@@ -194,8 +247,8 @@ export default function CreateVault() {
 
                   <Slider
                     value={[requiredSignatures]}
-                    min={1}
-                    max={owners.length}
+                    min={0}
+                    max={owners.length + 1}
                     step={1}
                     onValueChange={(value) => setRequiredSignatures(value[0])}
                   />
@@ -203,9 +256,11 @@ export default function CreateVault() {
                   <p className="text-sm text-muted-foreground">
                     {requiredSignatures === 1
                       ? "Only 1 signature is required. This provides minimal security."
-                      : requiredSignatures === owners.length
-                        ? "All owners must sign. This provides maximum security but may delay transactions."
-                        : `${requiredSignatures} of ${owners.length} owners must sign each transaction.`}
+                      : requiredSignatures === owners.length + 1
+                      ? "All owners must sign. This provides maximum security but may delay transactions."
+                      : `${requiredSignatures} of ${
+                          owners.length + 1
+                        } owners must sign each transaction.`}
                   </p>
                 </div>
               </CardContent>
@@ -220,15 +275,20 @@ export default function CreateVault() {
             <Card>
               <CardHeader>
                 <CardTitle>Advanced Settings</CardTitle>
-                <CardDescription>Configure additional security and operational settings</CardDescription>
+                <CardDescription>
+                  Configure additional security and operational settings
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
-                      <Label htmlFor="daily-limit">Daily Transaction Limit</Label>
+                      <Label htmlFor="daily-limit">
+                        Daily Transaction Limit
+                      </Label>
                       <p className="text-sm text-muted-foreground">
-                        Maximum amount that can be transferred in a 24-hour period
+                        Maximum amount that can be transferred in a 24-hour
+                        period
                       </p>
                     </div>
                     <div className="w-[180px]">
@@ -274,7 +334,9 @@ export default function CreateVault() {
                   <div className="flex items-center justify-between pt-2">
                     <div className="space-y-0.5">
                       <Label>Emergency Recovery</Label>
-                      <p className="text-sm text-muted-foreground">Allow recovery of funds if access is lost</p>
+                      <p className="text-sm text-muted-foreground">
+                        Allow recovery of funds if access is lost
+                      </p>
                     </div>
                     <Switch />
                   </div>
@@ -282,7 +344,9 @@ export default function CreateVault() {
                   <div className="flex items-center justify-between pt-2">
                     <div className="space-y-0.5">
                       <Label>Contract Interaction</Label>
-                      <p className="text-sm text-muted-foreground">Allow vault to interact with smart contracts</p>
+                      <p className="text-sm text-muted-foreground">
+                        Allow vault to interact with smart contracts
+                      </p>
                     </div>
                     <Switch defaultChecked />
                   </div>
@@ -290,12 +354,14 @@ export default function CreateVault() {
               </CardContent>
               <CardFooter className="flex justify-between">
                 <Button variant="outline">Back</Button>
-                <Button>Create Vault</Button>
+                <Button onClick={handleCreateVault}>
+                  {isCreatingSquad ? "Creating..." : "Create Vault"}
+                </Button>
               </CardFooter>
             </Card>
           </TabsContent>
         </Tabs>
       </main>
     </div>
-  )
+  );
 }

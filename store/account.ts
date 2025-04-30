@@ -24,6 +24,15 @@ export const useBalances = ({
 };
 
 async function getBalances(walletAddress: string) {
+  /**
+   *  const classicTokens = await connection.getParsedTokenAccountsByOwner(multisigVault, {
+          programId: TOKEN_PROGRAM_ID,
+        });
+        const t22Tokens = await connection.getParsedTokenAccountsByOwner(multisigVault, {
+          programId: TOKEN_2022_PROGRAM_ID,
+        });
+        return classicTokens.value.concat(t22Tokens.value);
+   */
   const response = await fetch(
     `https://v4-api.squads.so/balancesDasV2/${walletAddress}?sendAll=true&cacheBypass=false&useProd=true`
   );

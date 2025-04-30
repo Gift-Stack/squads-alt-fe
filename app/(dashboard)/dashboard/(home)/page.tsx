@@ -1,21 +1,10 @@
-"use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowUpRight } from "lucide-react";
 import DashboardHeader from "@/app/components/dashboard-header";
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { useRouter } from "next/navigation";
 import HomeTabs from "./home-tabs";
 
 export default function Dashboard() {
-  const router = useRouter();
-  const { primaryWallet } = useDynamicContext();
-
-  if (!primaryWallet) {
-    // Redirect to home
-    // router.push("/");
-  }
-
   return (
     <div className="flex min-h-screen flex-col bg-[#121212]">
       <DashboardHeader />
