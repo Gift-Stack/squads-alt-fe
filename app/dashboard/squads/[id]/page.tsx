@@ -24,7 +24,7 @@ import {
   BarChart3,
   History,
 } from "lucide-react";
-import DashboardHeader from "@/app/components/dashboard-header";
+import DashboardHeader from "@/app/dashboard/components/dashboard-header";
 import { useSquad } from "@/store/multi-sig";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { copyToClipboard } from "@/lib/utils";
@@ -77,8 +77,7 @@ export default function VaultDetails({
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <DashboardHeader />
+    <>
       <main className="flex-1 p-6 md:p-8 pt-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div className="flex items-center gap-2">
@@ -300,6 +299,6 @@ export default function VaultDetails({
         open={showAddMember}
         onClose={() => setShowAddMember(false)}
       />
-    </div>
+    </>
   );
 }

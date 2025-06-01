@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
 import SignupButton from "@/components/signup-button";
+import SignupButtonWithRouter from "@/components/signup-button-with-router";
 
 export default function Home() {
   return (
@@ -15,42 +14,30 @@ export default function Home() {
             <span className="text-xl font-bold text-white">Squads</span>
           </div>
           <nav className="hidden md:flex items-center gap-8">
-            <Link
-              href="#"
+            <a
+              href="https://app.squads.so"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-sm font-medium text-zinc-400 hover:text-white"
             >
-              Squads
-            </Link>
-            <Link
-              href="#"
+              OG Squads
+            </a>
+            <a
+              href="https://squads.xyz/protocol"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-sm font-medium text-zinc-400 hover:text-white"
             >
               Protocol
-            </Link>
-            <Link
-              href="#"
-              className="text-sm font-medium text-zinc-400 hover:text-white"
-            >
-              Extension
-            </Link>
-            <Link
-              href="#"
-              className="text-sm font-medium text-zinc-400 hover:text-white"
-            >
-              Use Cases
-            </Link>
-            <Link
-              href="#"
-              className="text-sm font-medium text-zinc-400 hover:text-white"
-            >
-              About
-            </Link>
-            <Link
-              href="#"
+            </a>
+            <a
+              href="https://squads.xyz/blog"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-sm font-medium text-zinc-400 hover:text-white"
             >
               Blog
-            </Link>
+            </a>
           </nav>
           <div className="flex items-center gap-4">
             <SignupButton />
@@ -79,7 +66,7 @@ export default function Home() {
               and manage them with your team.
             </p>
 
-            <SignupButton className="bg-white text-black hover:bg-zinc-200 px-6 py-6 text-lg rounded-md" />
+            <SignupButtonWithRouter />
           </div>
 
           <div className="mt-20 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl overflow-hidden max-w-5xl mx-auto">
@@ -155,12 +142,18 @@ export default function Home() {
           <div className="text-sm text-zinc-500">
             © 2024 Squads. All rights reserved.
           </div>
-          <Button
-            variant="outline"
-            className="text-white bg-transparent border-zinc-700 hover:bg-zinc-800"
+          <a
+            href="https://x.com/_0xGiFTED"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            Contact us
-          </Button>
+            <Button
+              variant="outline"
+              className="text-white bg-transparent border-zinc-700 hover:bg-zinc-800"
+            >
+              Contact us
+            </Button>
+          </a>
         </div>
       </footer>
     </div>

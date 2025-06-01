@@ -47,6 +47,11 @@ export const useAddMember = () => {
       );
       const newTransactionIndex = BigInt(currentTransactionIndex + 1);
 
+      console.log("{currentTransactionIndex,newTransactionIndex}", {
+        currentTransactionIndex,
+        newTransactionIndex,
+      });
+
       const permissionsMask: (typeof Permission)[keyof typeof Permission][] =
         [];
 
@@ -102,8 +107,13 @@ export const useAddMember = () => {
       const transaction = new VersionedTransaction(messageV0);
 
       const confirmation = await signer.signAndSendTransaction(
-        transaction as any
+        transaction as any,
+        {
+          skipPreflight: true,
+        }
       );
+
+      console.log("confirmati.signatureon", confirmation.signature);
 
       return confirmation.signature;
     },

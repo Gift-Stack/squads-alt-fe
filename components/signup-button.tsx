@@ -3,20 +3,20 @@
 import React, { useRef } from "react";
 import { DynamicWidget, useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Button } from "./ui/button";
-import { ArrowRight } from "lucide-react";
+import { Wallet } from "lucide-react";
 import { cn, shortenAddress } from "@/lib/utils";
-import { useRouter } from "next/navigation";
 
 const SignupButton = ({
   children,
   className,
+  onAfterConnectionClick,
 }: {
   children?: React.ReactNode;
   className?: string;
+  onAfterConnectionClick?: () => void;
 }) => {
   const walletConnectRef = useRef<HTMLSpanElement>(null);
   const { primaryWallet } = useDynamicContext();
-  const router = useRouter();
 
   return (
     <>
@@ -28,7 +28,7 @@ const SignupButton = ({
         )}
         onClick={(e) => {
           if (primaryWallet) {
-            router.push("/dashboard");
+            onAfterConnectionClick?.();
             return;
           }
           walletConnectRef.current?.click();
@@ -39,7 +39,7 @@ const SignupButton = ({
             <>{shortenAddress(primaryWallet.address)}</>
           ) : (
             <>
-              Get started <ArrowRight className="ml-2 h-4 w-4" />
+              Connect <Wallet className="ml-2 h-4 w-4" />
             </>
           ))}
       </Button>

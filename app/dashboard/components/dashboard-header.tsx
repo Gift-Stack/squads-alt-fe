@@ -14,13 +14,18 @@ import {
 import { Menu, X, LogOut } from "lucide-react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { shortenAddress } from "@/lib/utils";
+import SignupButton from "@/components/signup-button";
 
 export default function DashboardHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const { primaryWallet, handleLogOut: disconnect } = useDynamicContext();
+  const { handleLogOut: disconnect, user } = useDynamicContext();
 
-  const walletAddress = primaryWallet?.address;
+  const verifiedCredential = user?.verifiedCredentials.find(
+    (cred) => cred.chain === "solana"
+  );
+
+  const walletAddress = verifiedCredential?.address;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-zinc-800 bg-[#121212]/95 backdrop-blur supports-[backdrop-filter]:bg-[#121212]/60">
@@ -36,7 +41,7 @@ export default function DashboardHeader() {
           </Link>
         </div>
 
-        <nav
+        {/* <nav
           className={`${
             mobileMenuOpen
               ? "absolute inset-x-0 top-16 border-b border-zinc-800 bg-[#121212] p-6 md:hidden"
@@ -58,47 +63,41 @@ export default function DashboardHeader() {
           >
             Members
           </Link>
-        </nav>
+        </nav> */}
 
         <div className="flex items-center gap-4">
-          <Button
-            variant="outline"
-            size="sm"
-            className="hidden md:flex border-zinc-700 text-zinc-400 hover:bg-zinc-800 hover:text-white"
-          >
-            {shortenAddress(walletAddress || "")}
-          </Button>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="rounded-full h-8 w-8 bg-zinc-800"
+          {verifiedCredential ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="hidden md:flex border-zinc-700 text-zinc-400 hover:bg-zinc-800 hover:text-white"
+                >
+                  {shortenAddress(walletAddress || "")}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="bg-zinc-900 border-zinc-800"
               >
-                <span className="text-white font-medium text-sm">JD</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="bg-zinc-900 border-zinc-800"
-            >
-              <DropdownMenuLabel className="text-zinc-400">
-                My Account
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-zinc-800" />
-              <DropdownMenuSeparator className="bg-zinc-800" />
-              <DropdownMenuItem
-                onClick={() => {
-                  disconnect();
-                }}
-                className="gap-2 text-zinc-300 focus:bg-zinc-800 focus:text-white"
-              >
-                <LogOut className="h-4 w-4" /> Disconnect
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
+                <DropdownMenuLabel className="text-zinc-400">
+                  My Account
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-zinc-800" />
+                <DropdownMenuItem
+                  onClick={() => {
+                    disconnect();
+                  }}
+                  className="gap-2 text-zinc-300 focus:bg-zinc-800 focus:text-white"
+                >
+                  <LogOut className="h-4 w-4" /> Disconnect
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <SignupButton className="text-white" />
+          )}
           <Button
             variant="ghost"
             size="icon"

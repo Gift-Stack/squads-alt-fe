@@ -14,7 +14,7 @@ import {
   Users,
   ArrowRight,
 } from "lucide-react";
-import DashboardHeader from "@/app/components/dashboard-header";
+import DashboardHeader from "@/app/dashboard/components/dashboard-header";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useRouter } from "next/navigation";
 import Vaults from "./vaults";
