@@ -6,6 +6,6 @@
 - [x] Read existing balances (https://v4-api.squads.so/balancesDasV2/EkCCCqduZMDF5aUak4bNiC9SuReoTMJMtztzqVddSsTu?sendAll=true&cacheBypass=false&useProd=true)
 - [x] Manage existing squads
 - [x] Execute transactions (Vault & Config transactions)
-- [ ] Create new squads
+- [x] Create new squads
 - [ ] Increase threshold
 - [ ] Send, receive, and trade tokens
